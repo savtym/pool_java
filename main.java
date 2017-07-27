@@ -5,13 +5,15 @@ class main {
 
         Pool pool = new Pool(10, 4);
 
+        System.out.println(pool.getClass());
         pool.print();
 
-        PoolObj k1 = pool.allocate();
-        PoolObj k2 = pool.allocate();
-        PoolObj k3 = pool.allocate();
-
         try {
+
+            PoolObj k1 = pool.allocate();
+            PoolObj k2 = pool.allocate();
+            PoolObj k3 = pool.allocate();
+
 	        System.out.println(k1.getValue());
 	        System.out.println(k2.getValue());
 	        System.out.println(k3.getValue());
@@ -19,13 +21,14 @@ class main {
         	pool.print();
 
             k2.release();
-	        k3.release();
+            k3.release();
 	        k1.release();
-        } catch(Exception e) {
+            pool.print();
+
+        } catch(CustomException e) {
         	// TODO: release some action
     		System.out.println(e);
         }
 
-        pool.print();
     }
 }

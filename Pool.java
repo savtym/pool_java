@@ -2,55 +2,62 @@ import java.util.*;
 
 
 interface PoolObj {
-    void release();
-    Integer getValue();
+    void release() throws CustomException;
+    Integer getValue() throws CustomException;
 }
 
 class Pool {
-    private Queue<Optional<Integer>> queue = new LinkedList<Optional<Integer>>();
+    private Queue<Integer> queue = new LinkedList<Integer>();
 
-    Pool(Integer fisrt, Integer size) {
+    Pool(int fisrt, int size) {
         for (int i = 0; i < size; i++) {
-        	queue.add(Optional.of(fisrt++));
+        	queue.add(fisrt++);
         }
     }
 
     public void print() {
     	System.out.print("All elements of queue: ");
     	String coma = "";
-        for (Optional<Integer> str : queue) {
-		    System.out.print(coma + str.get());
+
+        for (Integer str : queue) {
+		    System.out.print(coma + str);
 		    coma = ", ";
 		}
+
     	System.out.println();
     }
 
-    public PoolObj allocate() {
-    	final Optional<Integer> poll = queue.poll();
 
-    	if (poll == null) {
-    		throw new NullPointerException("Current pool is null! Objects are Released!");
+    public PoolObj allocate() throws CustomException {
+    	final Integer value = queue.poll();
+
+    	if (value == null) {
+    		throw new CustomException("Current pool is null! Objects are Released!");
     	}
 
-    	return new PoolObj() {
-		    Optional<Integer> str = poll;
+        return getPoolObj(value);
+    }
 
-		    @Override
-		    public void release() {
-		    	if (!str.isPresent()) {
-		    		throw new NullPointerException("Current string was released!");
-		    	}
-		    	queue.add(str);
-		    	str = Optional.empty();
-		    }
+    private PoolObj getPoolObj(final Integer value) {
+        return new PoolObj() {
+            private boolean isReleased = false;
 
-		    @Override
-		    public Integer getValue() {
-		    	if (!str.isPresent()) {
-		    		throw new NullPointerException("Current string is null!");
-		    	}
-		    	return str.get();
-		    }
-    	};
+            @Override
+            public void release() throws CustomException {
+                if (isReleased) {
+                    throw new CustomException("Current string was released!");
+                }
+                queue.add(value);
+                isReleased = true;
+            }
+
+            @Override
+            public Integer getValue() throws CustomException {
+                if (isReleased) {
+                    throw new CustomException("Current string is null!");
+                }
+                return value;
+            }
+        };
     }
 }
