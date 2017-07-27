@@ -3,7 +3,7 @@ class main {
 
         System.out.println("Hello World!");
 
-        Pool pool = new Pool("1", "2", "3", "4");
+        Pool pool = new Pool(10, 4);
 
         pool.print();
 
