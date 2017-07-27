@@ -8,49 +8,50 @@ interface PoolObj {
 }
 
 class Pool {
-    private Queue<String> queue = new LinkedList<String>();
+    private Queue<Optional<String>> queue = new LinkedList<Optional<String>>();
 
     Pool(String... args) {
+
         for (int i = 0; i < args.length; i++) {
-        	queue.add(args[i]);
+        	queue.add(Optional.of(args[i]));
         }
     }
 
     public void print() {
     	System.out.print("All elements of queue: ");
     	String coma = "";
-        for (String str : queue) {
-		    System.out.print(coma + str);
+        for (Optional<String> str : queue) {
+		    System.out.print(coma + str.get());
 		    coma = ", ";
 		}
     	System.out.println();
     }
 
     public PoolObj allocate() {
-    	final String poll = queue.poll();
+    	final Optional<String> poll = queue.poll();
 
     	if (poll == null) {
-    		throw new IllegalArgumentException("Current pool is null! Release Objects");
+    		throw new NullPointerException("Current pool is null! Objects are Released!");
     	}
 
     	return new PoolObj() {
-		    String str = poll;
+		    Optional<String> str = poll;
 
 		    @Override
 		    public void release() {
-		    	if (str == null) {
-		    		throw new IllegalArgumentException("Current string was released!");
+		    	if (!str.isPresent()) {
+		    		throw new NullPointerException("Current string was released!");
 		    	}
 		    	queue.add(str);
-		    	str = null;
+		    	str = Optional.empty();
 		    }
 
 		    @Override
 		    public String getValue() {
-		    	if (str == null) {
-		    		throw new IllegalArgumentException("Current string is null!");
+		    	if (!str.isPresent()) {
+		    		throw new NullPointerException("Current string is null!");
 		    	}
-		    	return str;
+		    	return str.get();
 		    }
     	};
     }
